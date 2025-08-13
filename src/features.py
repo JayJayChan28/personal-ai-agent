@@ -1,9 +1,12 @@
 import pandas as pd
 import re
 import nltk
+import pickle
 nltk.download('stopwords')
 import string
 from nltk.corpus import stopwords
+from transformers import AutoTokenizer
+import torch
 
 stop_words = set(stopwords.words('english'))
 
@@ -47,5 +50,9 @@ def clean_text(text):
 goemotions_df['text'] = goemotions_df['text'].apply(clean_text)
 
 
-text = 'dog cat fish'
-text.split()
+
+#tokenizer for huggin face models (eg. BERT/DistilBERT)
+tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased") # offical tokenizer for hugging face 
+goemotions_tokens = tokenizer(goemotions_df['text'].tolist(), padding="max_length", truncation=True, return_tensors="pt")
+with open("../../personal-ai-agent-training/data/processed/goemotions_tokens.pkl", "wb") as f:
+    pickle.dump(goemotions_tokens, f)
